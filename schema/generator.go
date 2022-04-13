@@ -640,6 +640,12 @@ func (g *Generator) generateDDLsForAddForeignKey(tableName string, desiredForeig
 	}
 	desiredTable.foreignKeys = append(desiredTable.foreignKeys, desiredForeignKey)
 
+	currentTable := findTableByName(g.currentTables, tableName)
+	if containsString(convertForeignKeysToConstraintNames(currentTable.foreignKeys), desiredForeignKey.constraintName) {
+		return ddls, nil
+	}
+	ddls = append(ddls, statement)
+
 	return ddls, nil
 }
 
