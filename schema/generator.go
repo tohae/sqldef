@@ -88,6 +88,7 @@ func GenerateIdempotentDDLs(mode GeneratorMode, sqlParser database.Parser, desir
 // Main part of DDL genearation
 func (g *Generator) generateDDLs(desiredDDLs []DDL) ([]string, error) {
 	ddls := []string{}
+	ddls2 := []string{}
 
 	// Incrementally examine desiredDDLs
 	for _, ddl := range desiredDDLs {
@@ -126,7 +127,7 @@ func (g *Generator) generateDDLs(desiredDDLs []DDL) ([]string, error) {
 			if err != nil {
 				return ddls, err
 			}
-			ddls = append(ddls, fkeyDDLs...)
+			ddls2 = append(ddls2, fkeyDDLs...)
 		case *AddPolicy:
 			policyDDLs, err := g.generateDDLsForCreatePolicy(desired.tableName, desired.policy, "CREATE POLICY", ddl.Statement())
 			if err != nil {
@@ -233,6 +234,7 @@ func (g *Generator) generateDDLs(desiredDDLs []DDL) ([]string, error) {
 		ddls = append(ddls, fmt.Sprintf("DROP VIEW %s", g.escapeTableName(currentView.name)))
 	}
 
+	ddls = append(ddls, ddls2...)
 	return ddls, nil
 }
 
